@@ -128,7 +128,7 @@ fun AlbumScreen(
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -158,12 +158,12 @@ fun AlbumGridCell(
             modifier = Modifier
                 .aspectRatio(1.1f)
                 .clip(
-                    RoundedCornerShape(16.dp)
+                    RoundedCornerShape(12.dp)
                 )
                 .border(
                     1.dp,
                     MaterialTheme.colorScheme.outlineVariant,
-                    RoundedCornerShape(16.dp)
+                    RoundedCornerShape(12.dp)
                 )
         )
 

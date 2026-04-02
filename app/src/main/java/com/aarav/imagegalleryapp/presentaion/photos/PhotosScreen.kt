@@ -1,30 +1,25 @@
 package com.aarav.imagegalleryapp.presentaion.photos
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.compose.foundation.clickable
+import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -46,6 +40,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.aarav.imagegalleryapp.data.model.ImageItem
 import com.aarav.imagegalleryapp.utils.SnackbarManager
+import com.aarav.imagegalleryapp.utils.formatDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,9 +51,15 @@ fun PhotosScreen(
 
     val images = photosViewModel.images.collectAsLazyPagingItems()
 
+    val groupedList = remember(images.itemSnapshotList.items) {
+        images.itemSnapshotList.items
+            .groupBy { formatDate(it.dateAdded) }
+            .mapValues { (_, list) -> list.chunked(3) }
+    }
+
     LaunchedEffect(Unit) {
         photosViewModel.uiEvents.collect { event ->
-            if(event is UiEvents.Error) {
+            if (event is UiEvents.Error) {
                 SnackbarManager.showMessage(event.message)
             }
         }
@@ -85,12 +86,6 @@ fun PhotosScreen(
     LaunchedEffect(isGranted) {
         photosViewModel.onPermissionResult(isGranted)
     }
-
-//    LaunchedEffect(isGranted) {
-//        if(isGranted) {
-//            photosViewModel.loadImages(context)
-//        }
-//    }
 
     Scaffold(
         topBar = {
@@ -132,14 +127,42 @@ fun PhotosScreen(
                 }
 
                 else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    LazyColumn(
+                        //contentPadding = PaddingValues(horizontal = 16.dp),
+                        modifier = Modifier.fillMaxSize(),
                     ) {
-                        items(images.itemCount) {
-                            val image = images[it]
-                            image?.let {
-                                PhotoGridCell(it, context)
+
+                        groupedList.forEach { (date, rows) ->
+
+                            item {
+                                Text(
+                                    text = date,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                )
+                            }
+
+                            items(rows) { row ->
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+
+                                    row.forEachIndexed { index, image ->
+                                        PhotoGridCell(
+                                            imageItem = image,
+                                            index = index,
+                                            context = context,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+
+                                    repeat(3 - row.size) {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                }
                             }
                         }
                     }
@@ -152,7 +175,9 @@ fun PhotosScreen(
 @Composable
 fun PhotoGridCell(
     imageItem: ImageItem,
-    context: Context
+    index: Int,
+    context: Context,
+    modifier: Modifier = Modifier
 ) {
     val model = ImageRequest.Builder(context)
         .data(imageItem.uri)
@@ -163,8 +188,14 @@ fun PhotoGridCell(
         model = model,
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier
+        modifier = modifier
             .aspectRatio(1f)
-            .padding(vertical = 2.dp, horizontal = 1.dp)
+            .padding(
+                top = 2.dp,
+                bottom = 2.dp,
+                start = if (index == 0) 0.dp else 1.dp,
+                end = if (index == 2) 0.dp else 1.dp
+            )
+        //.padding(vertical = 2.dp, horizontal = 1.dp)
     )
 }
