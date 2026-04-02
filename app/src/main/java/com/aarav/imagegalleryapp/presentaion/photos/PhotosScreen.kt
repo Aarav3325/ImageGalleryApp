@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -155,7 +156,10 @@ fun PhotosScreen(
                                             imageItem = image,
                                             index = index,
                                             context = context,
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
+                                            onClick = {
+                                                photosViewModel.onSelectImage(image)
+                                            }
                                         )
                                     }
 
@@ -177,6 +181,7 @@ fun PhotoGridCell(
     imageItem: ImageItem,
     index: Int,
     context: Context,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val model = ImageRequest.Builder(context)
@@ -196,6 +201,9 @@ fun PhotoGridCell(
                 start = if (index == 0) 0.dp else 1.dp,
                 end = if (index == 2) 0.dp else 1.dp
             )
+            .clickable {
+                onClick()
+            }
         //.padding(vertical = 2.dp, horizontal = 1.dp)
     )
 }

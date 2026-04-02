@@ -1,18 +1,24 @@
 package com.aarav.imagegalleryapp.presentaion.photos
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.aarav.imagegalleryapp.data.model.Album
 import com.aarav.imagegalleryapp.data.model.ImageItem
 import com.aarav.imagegalleryapp.domain.GalleryRepository
+import com.aarav.imagegalleryapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +37,14 @@ class PhotosViewModel
 
     private val permissionGranted = MutableStateFlow(false)
 
+    fun onSelectImage(imageItem: ImageItem?) {
+        _uiState.update {
+            it.copy(
+                selectedImage = imageItem
+            )
+        }
+    }
+
     val images = permissionGranted
         .flatMapLatest {
             granted ->
@@ -43,6 +57,20 @@ class PhotosViewModel
         }
         .cachedIn(viewModelScope)
 
+    val albumImages = uiState
+        .map { it.selectedAlbum }
+        .distinctUntilChanged()
+        .flatMapLatest { album ->
+
+            if (album != null) {
+                repository.getAlbumImages(album.bucketId)
+            } else {
+                flowOf(PagingData.empty())
+            }
+        }
+        .cachedIn(viewModelScope)
+
+
     fun onPermissionResult(granted: Boolean) {
         permissionGranted.value = granted
 
@@ -51,6 +79,49 @@ class PhotosViewModel
                 isGranted = granted
             )
         }
+    }
+
+    fun loadAlbums(
+        context: Context
+    ) {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+
+        viewModelScope.launch {
+
+            when (val result = repository.getAllAlbums(context)) {
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            albums = result.data
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    emitError(result.message)
+                }
+            }
+        }
+    }
+
+    fun changeAlbumSelection(album: Album?) {
+        _uiState.update {
+            it.copy(
+                selectedAlbum = album
+            )
+        }
+
+        Log.d("MYTAG", "current : ${uiState.value.selectedAlbum}")
     }
 
     fun emitError(message: String) {
@@ -64,8 +135,12 @@ class PhotosViewModel
 
 data class PhotosUiState(
     val images: List<ImageItem> = emptyList(),
+    val selectedImage: ImageItem? = null,
     val isLoading: Boolean = false,
-    val isGranted: Boolean = false
+    val isGranted: Boolean = false,
+    val albums: List<Album> = emptyList(),
+    val albumLoading: Boolean = false,
+    val selectedAlbum: Album? = null
 )
 
 sealed class UiEvents {

@@ -14,4 +14,6 @@ interface GalleryRepository {
 
     fun getAllImages(): Flow<PagingData<ImageItem>>
 
+    fun getAlbumImages(bucketId: String): Flow<PagingData<ImageItem>>
+
 }

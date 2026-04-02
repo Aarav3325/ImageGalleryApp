@@ -1,6 +1,7 @@
 package com.aarav.imagegalleryapp.presentaion.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -8,8 +9,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import com.aarav.imagegalleryapp.presentaion.albums.AlbumDetailScreen
 import com.aarav.imagegalleryapp.presentaion.albums.AlbumScreen
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosScreen
+import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
 
 @Composable
 fun NavGraph(
@@ -18,16 +22,26 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = NavRoute.Photos.path,
+        startDestination = "album_graph",
     ) {
-        AddPhotosScreen(
-            navHostController,
-            this
-        )
-        AddAlbumScreen(
-            navHostController,
-            this
-        )
+
+        navigation(
+            route = "album_graph",
+            startDestination = NavRoute.Photos.path
+        ) {
+            AddPhotosScreen(
+                navHostController,
+                this
+            )
+            AddAlbumScreen(
+                navHostController,
+                this
+            )
+            AddAlbumDetialScreen(
+                navHostController,
+                this
+            )
+        }
     }
 }
 
@@ -37,9 +51,16 @@ fun AddPhotosScreen(
 ) {
     navGraphBuilder.composable(
         route = NavRoute.Photos.path
-    ) {
+    ) { backStackEntry ->
+
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("album_graph")
+        }
+
+        val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
+
         PhotosScreen(
-            photosViewModel = hiltViewModel()
+            photosViewModel = sharedVM
         )
     }
 }
@@ -50,9 +71,42 @@ fun AddAlbumScreen(
 ) {
     navGraphBuilder.composable(
         route = NavRoute.Albums.path
-    ) {
+    ) { backStackEntry ->
+
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("album_graph")
+        }
+
+        val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
+
         AlbumScreen(
-            albumViewModel = hiltViewModel()
+            photosViewModel = sharedVM,
+            navigateToDetail = {
+                navController.navigate(NavRoute.AlbumDetail.path)
+            }
+        )
+    }
+}
+
+fun AddAlbumDetialScreen(
+    navController: NavController,
+    navGraphBuilder: NavGraphBuilder
+) {
+    navGraphBuilder.composable(
+        route = NavRoute.AlbumDetail.path
+    ) { backStackEntry ->
+
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("album_graph")
+        }
+
+        val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
+
+        AlbumDetailScreen(
+            photosViewModel = sharedVM,
+            onBack = {
+                navController.popBackStack()
+            }
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.paging.PagingData
 import com.aarav.imagegalleryapp.data.datasource.MediaStoreDataSource
 import com.aarav.imagegalleryapp.data.model.Album
 import com.aarav.imagegalleryapp.data.model.ImageItem
+import com.aarav.imagegalleryapp.data.paging.AlbumPagingSource
 import com.aarav.imagegalleryapp.data.paging.GalleryPagingSource
 import com.aarav.imagegalleryapp.domain.GalleryRepository
 import com.aarav.imagegalleryapp.utils.Resource
@@ -92,7 +93,7 @@ class GalleryRepositoryImpl
                     name = imageList.first().bucketName,
                     thumbnail = imageList.first().uri,
                     imageCount = imageList.size,
-                    images = imageList
+                    bucketId = imageList.first().bucketId
                 )
             }
 
@@ -108,6 +109,21 @@ class GalleryRepositoryImpl
             pagingSourceFactory = {
                 GalleryPagingSource(
                     mediaStoreDataSource
+                )
+            }
+        ).flow
+    }
+
+    override fun getAlbumImages(bucketId: String): Flow<PagingData<ImageItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 50,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                AlbumPagingSource(
+                    mediaStoreDataSource,
+                    bucketId
                 )
             }
         ).flow

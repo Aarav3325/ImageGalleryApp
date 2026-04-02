@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,23 +45,17 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.aarav.imagegalleryapp.data.model.Album
+import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
 import com.aarav.imagegalleryapp.presentaion.photos.UiEvents
 import com.aarav.imagegalleryapp.utils.SnackbarManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumScreen(
-    albumViewModel: AlbumViewModel
+    photosViewModel: PhotosViewModel,
+    navigateToDetail: () -> Unit
 ) {
-    val uiState by albumViewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        albumViewModel.uiEvents.collect { event ->
-            if (event is UiEvents.Error) {
-                SnackbarManager.showMessage(event.message)
-            }
-        }
-    }
+    val uiState by photosViewModel.uiState.collectAsState()
 
     val context = LocalContext.current
 
@@ -82,7 +77,7 @@ fun AlbumScreen(
 
     LaunchedEffect(isGranted) {
         if(isGranted) {
-            albumViewModel.loadAlbums(context)
+            photosViewModel.loadAlbums(context)
         }
     }
 
@@ -133,7 +128,13 @@ fun AlbumScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(uiState.albums) {
-                            AlbumGridCell(album = it)
+                            AlbumGridCell(
+                                album = it,
+                                onClick = {
+                                    photosViewModel.changeAlbumSelection(it)
+                                    navigateToDetail()
+                                }
+                            )
                         }
                     }
                 }
@@ -144,7 +145,8 @@ fun AlbumScreen(
 
 @Composable
 fun AlbumGridCell(
-    album: Album
+    album: Album,
+    onClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
@@ -165,6 +167,9 @@ fun AlbumGridCell(
                     MaterialTheme.colorScheme.outlineVariant,
                     RoundedCornerShape(12.dp)
                 )
+                .clickable {
+                    onClick()
+                }
         )
 
         Spacer(Modifier.height(8.dp))
