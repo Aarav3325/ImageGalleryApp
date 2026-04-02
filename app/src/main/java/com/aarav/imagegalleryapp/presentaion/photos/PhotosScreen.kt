@@ -46,7 +46,8 @@ import com.aarav.imagegalleryapp.utils.formatDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotosScreen(
-    photosViewModel: PhotosViewModel
+    photosViewModel: PhotosViewModel,
+    navigateToDisplay: () -> Unit
 ) {
     val uiState by photosViewModel.uiState.collectAsState()
 
@@ -159,6 +160,7 @@ fun PhotosScreen(
                                             modifier = Modifier.weight(1f),
                                             onClick = {
                                                 photosViewModel.onSelectImage(image)
+                                                navigateToDisplay()
                                             }
                                         )
                                     }

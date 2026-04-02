@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aarav.imagegalleryapp.presentaion.albums.AlbumDetailScreen
 import com.aarav.imagegalleryapp.presentaion.albums.AlbumScreen
+import com.aarav.imagegalleryapp.presentaion.preview.FullscreenPreview
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosScreen
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
 
@@ -41,6 +42,10 @@ fun NavGraph(
                 navHostController,
                 this
             )
+            AddDisplayImageScreen(
+                navHostController,
+                this
+            )
         }
     }
 }
@@ -60,7 +65,10 @@ fun AddPhotosScreen(
         val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
 
         PhotosScreen(
-            photosViewModel = sharedVM
+            photosViewModel = sharedVM,
+            navigateToDisplay = {
+                navController.navigate(NavRoute.DisplayImage.path)
+            }
         )
     }
 }
@@ -103,6 +111,32 @@ fun AddAlbumDetialScreen(
         val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
 
         AlbumDetailScreen(
+            photosViewModel = sharedVM,
+            onBack = {
+                navController.popBackStack()
+            },
+            navigateToDisplay = {
+                navController.navigate(NavRoute.DisplayImage.path)
+            }
+        )
+    }
+}
+
+fun AddDisplayImageScreen(
+    navController: NavController,
+    navGraphBuilder: NavGraphBuilder
+) {
+    navGraphBuilder.composable(
+        route = NavRoute.DisplayImage.path
+    ) { backStackEntry ->
+
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("album_graph")
+        }
+
+        val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
+
+        FullscreenPreview(
             photosViewModel = sharedVM,
             onBack = {
                 navController.popBackStack()

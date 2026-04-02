@@ -39,7 +39,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AlbumDetailScreen(
     photosViewModel: PhotosViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    navigateToDisplay: () -> Unit
 ) {
     val uiState by photosViewModel.uiState.collectAsState()
 
@@ -118,6 +119,7 @@ fun AlbumDetailScreen(
                                     context = context,
                                     onClick = {
                                         photosViewModel.onSelectImage(it)
+                                        navigateToDisplay()
                                     }
                                 )
                             }
