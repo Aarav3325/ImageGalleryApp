@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.aarav.imagegalleryapp.R
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.aarav.imagegalleryapp.presentaion.photos.ImageSource
 import com.aarav.imagegalleryapp.presentaion.photos.PhotoGridCell
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
 import kotlinx.coroutines.delay
@@ -118,7 +119,8 @@ fun AlbumDetailScreen(
                                     index = index,
                                     context = context,
                                     onClick = {
-                                        photosViewModel.onSelectImage(it)
+                                        photosViewModel.openPreview(index, ImageSource.ALBUM)
+                                       //photosViewModel.onSelectImage(it)
                                         navigateToDisplay()
                                     }
                                 )

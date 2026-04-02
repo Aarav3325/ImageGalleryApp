@@ -118,7 +118,7 @@ fun PhotosScreen(
                         //contentPadding = PaddingValues(horizontal = 16.dp),
                         modifier = Modifier.fillMaxSize(),
                     ) {
-
+                        var globalIndex = 0
                         groupedList.forEach { (date, rows) ->
 
                             item {
@@ -137,17 +137,23 @@ fun PhotosScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
 
-                                    row.forEachIndexed { index, image ->
+                                    row.forEachIndexed { localIndex, image ->
+
+                                        val currentIndex = globalIndex
+
                                         PhotoGridCell(
                                             imageItem = image,
-                                            index = index,
+                                            index = localIndex,
                                             context = context,
                                             modifier = Modifier.weight(1f),
                                             onClick = {
-                                                photosViewModel.onSelectImage(image)
+                                                photosViewModel.openPreview(currentIndex, ImageSource.ALL)
+                                                //photosViewModel.onSelectImage(image)
                                                 navigateToDisplay()
                                             }
                                         )
+
+                                        globalIndex++
                                     }
 
                                     repeat(3 - row.size) {

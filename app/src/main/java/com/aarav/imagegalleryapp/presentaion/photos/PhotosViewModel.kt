@@ -124,6 +124,15 @@ class PhotosViewModel
         Log.d("MYTAG", "current : ${uiState.value.selectedAlbum}")
     }
 
+    fun openPreview(index: Int, source: ImageSource) {
+        _uiState.update {
+            it.copy(
+                selectedIndex = index,
+                activeSource = source
+            )
+        }
+    }
+
     fun emitError(message: String) {
         viewModelScope.launch {
             _uiEvents.emit(
@@ -136,6 +145,8 @@ class PhotosViewModel
 data class PhotosUiState(
     val images: List<ImageItem> = emptyList(),
     val selectedImage: ImageItem? = null,
+    val selectedIndex: Int = 0,
+    val activeSource: ImageSource = ImageSource.ALL,
     val isLoading: Boolean = false,
     val isGranted: Boolean = false,
     val albums: List<Album> = emptyList(),
@@ -145,4 +156,9 @@ data class PhotosUiState(
 
 sealed class UiEvents {
     data class Error(val message: String) : UiEvents()
+}
+
+enum class ImageSource {
+    ALL,
+    ALBUM
 }

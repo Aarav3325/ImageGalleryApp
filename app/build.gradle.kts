@@ -44,6 +44,7 @@ android {
 dependencies {
 
 
+    implementation(libs.androidx.compose.foundation)
     val paging_version = "3.4.0"
     implementation("androidx.paging:paging-compose:${paging_version}")
 
