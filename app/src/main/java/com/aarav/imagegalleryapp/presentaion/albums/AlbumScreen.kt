@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -79,11 +80,11 @@ fun AlbumScreen(
         )
     }
 
-//    LaunchedEffect(isGranted) {
-//        if(isGranted) {
-//            albumViewModel.loadAlbums(context)
-//        }
-//    }
+    LaunchedEffect(isGranted) {
+        if(isGranted) {
+            albumViewModel.loadAlbums(context)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -104,6 +105,13 @@ fun AlbumScreen(
                 .fillMaxSize()
         ) {
             when {
+                !isGranted -> {
+                    Text(
+                        text = "Permission required to show albums",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
                 uiState.isLoading -> {
                     CircularProgressIndicator(
                         Modifier.align(Alignment.Center)
@@ -120,7 +128,9 @@ fun AlbumScreen(
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
-                        contentPadding = PaddingValues(horizontal = 16.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(uiState.albums) {
                             AlbumGridCell(album = it)
@@ -146,8 +156,7 @@ fun AlbumGridCell(
             contentDescription = "Album thumbnail",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .width(136.dp)
-                .height(124.dp)
+                .aspectRatio(1.1f)
                 .clip(
                     RoundedCornerShape(16.dp)
                 )

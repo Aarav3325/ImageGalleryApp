@@ -32,9 +32,9 @@ class MediaStoreDataSource
         val bundle = Bundle().apply {
             putInt(ContentResolver.QUERY_ARG_LIMIT, pageSize)
             putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
-            putString(
+            putStringArray(
                 ContentResolver.QUERY_ARG_SORT_COLUMNS,
-                MediaStore.Images.Media.DATE_ADDED
+                arrayOf(MediaStore.Images.Media.DATE_ADDED)
             )
             putInt(
                 ContentResolver.QUERY_ARG_SORT_DIRECTION,

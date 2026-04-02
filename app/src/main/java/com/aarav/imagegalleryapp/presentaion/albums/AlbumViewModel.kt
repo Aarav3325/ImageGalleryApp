@@ -28,6 +28,40 @@ class AlbumViewModel
     private val _uiEvents = MutableSharedFlow<UiEvents>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    fun loadAlbums(
+        context: Context
+    ) {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+
+        viewModelScope.launch {
+
+            when (val result = repository.getAllAlbums(context)) {
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            albums = result.data
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    emitError(result.message)
+                }
+            }
+        }
+    }
+
+
     fun emitError(message: String) {
         viewModelScope.launch {
             _uiEvents.emit(

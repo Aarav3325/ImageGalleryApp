@@ -9,7 +9,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,6 +82,10 @@ fun PhotosScreen(
         )
     }
 
+    LaunchedEffect(isGranted) {
+        photosViewModel.onPermissionResult(isGranted)
+    }
+
 //    LaunchedEffect(isGranted) {
 //        if(isGranted) {
 //            photosViewModel.loadImages(context)
@@ -105,6 +111,13 @@ fun PhotosScreen(
                 .padding(it)
         ) {
             when {
+                !isGranted -> {
+                    Text(
+                        text = "Permission required to show images",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
                 images.loadState.refresh is LoadState.Loading -> {
                     CircularProgressIndicator(
                         Modifier.align(Alignment.Center)
@@ -149,9 +162,9 @@ fun PhotoGridCell(
     AsyncImage(
         model = model,
         contentDescription = null,
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.Crop,
         modifier = Modifier
-            .size(120.dp)
-            .padding(vertical = 8.dp)
+            .aspectRatio(1f)
+            .padding(vertical = 2.dp, horizontal = 1.dp)
     )
 }
