@@ -86,7 +86,7 @@ class PhotosViewModel
     ) {
         _uiState.update {
             it.copy(
-                isLoading = true
+                albumLoading = true
             )
         }
 
@@ -96,7 +96,7 @@ class PhotosViewModel
                 is Resource.Success -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
+                            albumLoading = false,
                             albums = result.data
                         )
                     }
@@ -105,7 +105,7 @@ class PhotosViewModel
                 is Resource.Error -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false
+                            albumLoading = false
                         )
                     }
                     emitError(result.message)

@@ -47,6 +47,7 @@ import com.aarav.imagegalleryapp.utils.formatDate
 @Composable
 fun PhotosScreen(
     photosViewModel: PhotosViewModel,
+    isGranted: Boolean,
     navigateToDisplay: () -> Unit
 ) {
     val uiState by photosViewModel.uiState.collectAsState()
@@ -68,22 +69,6 @@ fun PhotosScreen(
     }
 
     val context = LocalContext.current
-
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-
-    var isGranted by remember {
-        mutableStateOf(
-            ContextCompat
-                .checkSelfPermission(
-                    context,
-                    permission
-                ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
 
     LaunchedEffect(isGranted) {
         photosViewModel.onPermissionResult(isGranted)

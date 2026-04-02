@@ -39,37 +39,7 @@ fun FullscreenPreview(
     val uiState by photosViewModel.uiState.collectAsState()
 
     val scope = rememberCoroutineScope()
-//
-//    Scaffold(
-//        topBar = {
-//            CenterAlignedTopAppBar(
-//                title = {
-//                    Text(
-//                        text = "Albums",
-//                        style = MaterialTheme.typography.titleLarge,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                },
-//                navigationIcon = {
-//                    IconButton(
-//                        onClick = {
-//                            scope.launch {
-//                                onBack()
-//                                delay(200)
-//                                photosViewModel.changeAlbumSelection(null)
-//                            }
-//                        }
-//                    ) {
-//                        Icon(
-//                            painter = painterResource(R.drawable.back),
-//                            contentDescription = "Back",
-//                            modifier = Modifier.size(24.dp)
-//                        )
-//                    }
-//                }
-//            )
-//        }
-//    ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +51,8 @@ fun FullscreenPreview(
                 .padding(top = 60.dp)
         ) {
             IconButton(
-                modifier = Modifier.align(Alignment.CenterStart),
+                modifier = Modifier.align(Alignment.CenterStart)
+                    .padding(start = 4.dp),
                 onClick = {
                     scope.launch {
                         onBack()
@@ -127,4 +98,3 @@ fun FullscreenPreview(
         }
     }
 }
-//}

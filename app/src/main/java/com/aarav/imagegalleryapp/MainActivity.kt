@@ -2,6 +2,7 @@ package com.aarav.imagegalleryapp
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
@@ -52,7 +53,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-            RequestStoragePermission(sharedPreferences)
+
+            val context = LocalContext.current
+
+            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_IMAGES
+            } else {
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+
+
+            var isGranted by remember {
+                mutableStateOf(
+                    ContextCompat
+                        .checkSelfPermission(
+                            context,
+                            permission
+                        ) == PackageManager.PERMISSION_GRANTED
+                )
+            }
+
+
+            RequestStoragePermission(
+                context,
+                sharedPreferences,
+                isGranted,
+                onGranted = {
+                    isGranted = it
+                },
+                permission
+            )
 
             val navController = rememberNavController()
 
@@ -91,6 +121,7 @@ class MainActivity : ComponentActivity() {
 
                     NavGraph(
                         navController,
+                        isGranted,
                         Modifier.padding(innerPadding)
                     )
                 }
@@ -101,26 +132,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun RequestStoragePermission(
-    sharedPreferences: SharedPreferences
+    context: Context,
+    sharedPreferences: SharedPreferences,
+    isGranted: Boolean,
+    onGranted: (Boolean) -> Unit,
+    permission: String
 ) {
-    val context = LocalContext.current
-    val activity = context as Activity
 
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-
-    var isGranted by remember {
-        mutableStateOf(
-            ContextCompat
-                .checkSelfPermission(
-                    context,
-                    permission
-                ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
 
     LaunchedEffect(isGranted) {
         val alreadyGranted = sharedPreferences.getBoolean("storage_permission", false)
@@ -141,7 +159,7 @@ fun RequestStoragePermission(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) {
-        isGranted = it
+        onGranted(it)
     }
 
     LaunchedEffect(Unit) {

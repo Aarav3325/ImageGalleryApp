@@ -19,6 +19,7 @@ import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
 @Composable
 fun NavGraph(
     navHostController: NavHostController,
+    isGranted: Boolean,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -31,10 +32,12 @@ fun NavGraph(
             startDestination = NavRoute.Photos.path
         ) {
             AddPhotosScreen(
+                isGranted,
                 navHostController,
                 this
             )
             AddAlbumScreen(
+                isGranted,
                 navHostController,
                 this
             )
@@ -51,6 +54,7 @@ fun NavGraph(
 }
 
 fun AddPhotosScreen(
+    isGranted: Boolean,
     navController: NavController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -66,14 +70,16 @@ fun AddPhotosScreen(
 
         PhotosScreen(
             photosViewModel = sharedVM,
+            isGranted = isGranted,
             navigateToDisplay = {
-                navController.navigate(NavRoute.DisplayImage.path)
+                navController.navigate(NavRoute.FullscreenPreview.path)
             }
         )
     }
 }
 
 fun AddAlbumScreen(
+    isGranted: Boolean,
     navController: NavController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -89,6 +95,7 @@ fun AddAlbumScreen(
 
         AlbumScreen(
             photosViewModel = sharedVM,
+            isGranted = isGranted,
             navigateToDetail = {
                 navController.navigate(NavRoute.AlbumDetail.path)
             }
@@ -116,7 +123,7 @@ fun AddAlbumDetialScreen(
                 navController.popBackStack()
             },
             navigateToDisplay = {
-                navController.navigate(NavRoute.DisplayImage.path)
+                navController.navigate(NavRoute.FullscreenPreview.path)
             }
         )
     }
@@ -127,7 +134,7 @@ fun AddDisplayImageScreen(
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
-        route = NavRoute.DisplayImage.path
+        route = NavRoute.FullscreenPreview.path
     ) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
