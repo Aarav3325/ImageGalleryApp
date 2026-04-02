@@ -1,6 +1,6 @@
 package com.aarav.imagegalleryapp.di
 
-import com.aarav.imagegalleryapp.data.GalleryRepositoryImpl
+import com.aarav.imagegalleryapp.data.repository.GalleryRepositoryImpl
 import com.aarav.imagegalleryapp.domain.GalleryRepository
 import dagger.Binds
 import dagger.Module

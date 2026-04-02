@@ -2,6 +2,7 @@ package com.aarav.imagegalleryapp.presentaion.photos
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.aarav.imagegalleryapp.data.model.ImageItem
 import com.aarav.imagegalleryapp.utils.SnackbarManager
 
@@ -46,6 +51,8 @@ fun PhotosScreen(
     photosViewModel: PhotosViewModel
 ) {
     val uiState by photosViewModel.uiState.collectAsState()
+
+    val images = photosViewModel.images.collectAsLazyPagingItems()
 
     LaunchedEffect(Unit) {
         photosViewModel.uiEvents.collect { event ->
@@ -73,16 +80,15 @@ fun PhotosScreen(
         )
     }
 
-    LaunchedEffect(isGranted) {
-        if(isGranted) {
-            photosViewModel.loadImages(context)
-        }
-    }
+//    LaunchedEffect(isGranted) {
+//        if(isGranted) {
+//            photosViewModel.loadImages(context)
+//        }
+//    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                expandedHeight = 52.dp,
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = "Photos",
@@ -99,13 +105,13 @@ fun PhotosScreen(
                 .padding(it)
         ) {
             when {
-                uiState.isLoading -> {
+                images.loadState.refresh is LoadState.Loading -> {
                     CircularProgressIndicator(
                         Modifier.align(Alignment.Center)
                     )
                 }
 
-                uiState.images.isEmpty() -> {
+                images.itemSnapshotList.isEmpty() -> {
                     Text(
                         text = "No images found",
                         modifier = Modifier.align(Alignment.Center)
@@ -117,8 +123,11 @@ fun PhotosScreen(
                         columns = GridCells.Fixed(3),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(uiState.images) {
-                            PhotoGridCell(it)
+                        items(images.itemCount) {
+                            val image = images[it]
+                            image?.let {
+                                PhotoGridCell(it, context)
+                            }
                         }
                     }
                 }
@@ -129,10 +138,16 @@ fun PhotosScreen(
 
 @Composable
 fun PhotoGridCell(
-    imageItem: ImageItem
+    imageItem: ImageItem,
+    context: Context
 ) {
+    val model = ImageRequest.Builder(context)
+        .data(imageItem.uri)
+        .size(300)
+        .build()
+
     AsyncImage(
-        model = imageItem.uri.toString(),
+        model = model,
         contentDescription = null,
         contentScale = ContentScale.Fit,
         modifier = Modifier
