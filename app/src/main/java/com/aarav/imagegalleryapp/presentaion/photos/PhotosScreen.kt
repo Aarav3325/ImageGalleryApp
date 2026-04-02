@@ -1,10 +1,6 @@
 package com.aarav.imagegalleryapp.presentaion.photos
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,16 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
@@ -116,7 +109,8 @@ fun PhotosScreen(
                 else -> {
                     LazyColumn(
                         //contentPadding = PaddingValues(horizontal = 16.dp),
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize()
+                            .padding(bottom = 82.dp),
                     ) {
                         var globalIndex = 0
                         groupedList.forEach { (date, rows) ->
@@ -189,14 +183,13 @@ fun PhotoGridCell(
         modifier = modifier
             .aspectRatio(1f)
             .padding(
-                top = 2.dp,
-                bottom = 2.dp,
+                top = 1.dp,
+                bottom = 1.dp,
                 start = if (index == 0) 0.dp else 1.dp,
                 end = if (index == 2) 0.dp else 1.dp
             )
             .clickable {
                 onClick()
             }
-        //.padding(vertical = 2.dp, horizontal = 1.dp)
     )
 }

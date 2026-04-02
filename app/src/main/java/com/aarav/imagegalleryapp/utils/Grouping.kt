@@ -9,7 +9,7 @@ import java.util.Locale
 
 fun formatDate(timestamp: Long): String {
     val imageDate = Calendar.getInstance().apply {
-        timeInMillis = timestamp * 1000
+        timeInMillis = timestamp
     }
 
     val today = Calendar.getInstance()

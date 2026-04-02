@@ -23,6 +23,8 @@ class MediaStoreDataSource
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
             MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.DATE_TAKEN,
+            MediaStore.Images.Media.DATE_MODIFIED,
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
         )
@@ -50,9 +52,13 @@ class MediaStoreDataSource
         query?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+            val dateTakenColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
             val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
             val bucketNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
             val displayNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val dateModifiedColumn = cursor.getColumnIndexOrThrow(
+                MediaStore.Images.Media.DATE_MODIFIED
+            )
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -62,12 +68,23 @@ class MediaStoreDataSource
                     id
                 )
 
+                val dateTaken = cursor.getLong(dateTakenColumn)
+                val dateAdded = cursor.getLong(dateAddedColumn)
+                val dateModified = cursor.getLong(dateModifiedColumn)
+
+                val finalDate = when {
+                    dateTaken > 0 -> dateTaken
+                    dateModified > 0 -> dateModified * 1000 // seconds → millis
+                    dateAdded > 0 -> dateAdded * 1000
+                    else -> System.currentTimeMillis()
+                }
+
                 imageList.add(
                     ImageItem(
                         id,
                         cursor.getString(displayNameColumn),
                         uri,
-                        cursor.getLong(dateAddedColumn),
+                        finalDate,
                         cursor.getString(bucketIdColumn),
                         cursor.getString(bucketNameColumn)
                     )
@@ -90,6 +107,8 @@ class MediaStoreDataSource
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
             MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.DATE_TAKEN,
+            MediaStore.Images.Media.DATE_MODIFIED,
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
         )
@@ -132,6 +151,12 @@ class MediaStoreDataSource
             val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
             val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
             val bucketNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+            val dateTakenColumn = cursor.getColumnIndexOrThrow(
+                MediaStore.Images.Media.DATE_TAKEN
+            )
+            val dateModifiedColumn = cursor.getColumnIndexOrThrow(
+                MediaStore.Images.Media.DATE_MODIFIED
+            )
 
             while (cursor.moveToNext()) {
 
@@ -142,13 +167,23 @@ class MediaStoreDataSource
                     id
                 )
 
+                val dateTaken = cursor.getLong(dateTakenColumn)
+                val dateAdded = cursor.getLong(dateAddedColumn)
+                val dateModified = cursor.getLong(dateModifiedColumn)
+
+                val finalDate = when {
+                    dateTaken > 0 -> dateTaken
+                    dateModified > 0 -> dateModified * 1000 // seconds → millis
+                    dateAdded > 0 -> dateAdded * 1000
+                    else -> System.currentTimeMillis()
+                }
 
                 imageList.add(
                     ImageItem(
                         id = id,
                         displayName = cursor.getString(nameColumn),
                         uri = uri,
-                        dateAdded = cursor.getLong(dateAddedColumn),
+                        dateAdded = finalDate,
                         bucketId = cursor.getString(bucketIdColumn),
                         bucketName = cursor.getString(bucketNameColumn)
                     )

@@ -108,9 +108,11 @@ fun AlbumScreen(
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxSize()
+                            .padding(bottom = 80.dp)
                     ) {
                         items(uiState.albums) {
                             AlbumGridCell(
@@ -135,7 +137,7 @@ fun AlbumGridCell(
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        //verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
     ) {
         AsyncImage(
@@ -161,7 +163,7 @@ fun AlbumGridCell(
 
         Text(
             text = album.name,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         Text(

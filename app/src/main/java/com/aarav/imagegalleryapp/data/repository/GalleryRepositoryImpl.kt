@@ -91,6 +91,7 @@ class GalleryRepositoryImpl
             .map { (_, imageList) ->
                 Album(
                     name = imageList.first().bucketName,
+                    images = imageList,
                     thumbnail = imageList.first().uri,
                     imageCount = imageList.size,
                     bucketId = imageList.first().bucketId
