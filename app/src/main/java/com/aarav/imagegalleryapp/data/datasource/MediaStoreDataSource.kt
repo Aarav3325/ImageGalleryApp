@@ -74,7 +74,7 @@ class MediaStoreDataSource
 
                 val finalDate = when {
                     dateTaken > 0 -> dateTaken
-                    dateModified > 0 -> dateModified * 1000 // seconds → millis
+                    dateModified > 0 -> dateModified * 1000
                     dateAdded > 0 -> dateAdded * 1000
                     else -> System.currentTimeMillis()
                 }

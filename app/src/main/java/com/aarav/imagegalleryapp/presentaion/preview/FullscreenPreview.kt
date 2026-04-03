@@ -48,8 +48,13 @@ fun FullscreenPreview(
         }
     }
 
+    val startIndex = remember(images.itemSnapshotList.items) {
+        images.itemSnapshotList.items.indexOfFirst {
+            it.id == uiState.selectedImage?.id
+        }.coerceAtLeast(0)
+    }
     val pagerState = rememberPagerState(
-        initialPage = uiState.selectedIndex,
+        initialPage = startIndex,
         pageCount = {
             images.itemCount
         }

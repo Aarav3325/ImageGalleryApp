@@ -156,6 +156,7 @@ fun AlbumDetailScreen(
                                             modifier = Modifier.weight(1f),
                                             onClick = {
                                                 photosViewModel.openPreview(currentIndex, ImageSource.ALBUM)
+                                                photosViewModel.onSelectImage(image)
                                                 navigateToDisplay()
                                             }
                                         )

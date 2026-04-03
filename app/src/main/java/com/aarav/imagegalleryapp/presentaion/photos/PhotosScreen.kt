@@ -142,7 +142,7 @@ fun PhotosScreen(
                                             modifier = Modifier.weight(1f),
                                             onClick = {
                                                 photosViewModel.openPreview(currentIndex, ImageSource.ALL)
-                                                //photosViewModel.onSelectImage(image)
+                                                photosViewModel.onSelectImage(image)
                                                 navigateToDisplay()
                                             }
                                         )
