@@ -1,5 +1,6 @@
 package com.aarav.imagegalleryapp.presentaion.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -75,9 +77,10 @@ fun CalendarComponent(
     val currentMonth = YearMonth.now()
         .plusMonths((pagerState.currentPage - 500).toLong())
 
-    val settledPage = pagerState.settledPage
-
-    Column {
+    Column(
+        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(bottom = 12.dp)
+    ) {
 
         Row(
             modifier = Modifier
@@ -109,7 +112,8 @@ fun CalendarComponent(
                         .replaceFirstChar { it.uppercase() }
                 } ${currentMonth.year}",
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
             )
 
             IconButton(
@@ -135,7 +139,7 @@ fun CalendarComponent(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             DayOfWeek.entries.forEach {
-                Text(text = it.abbr.take(1))
+                Text(text = it.abbr.take(1), modifier = Modifier.padding(bottom = 8.dp))
             }
         }
 
@@ -143,8 +147,10 @@ fun CalendarComponent(
             modifier = Modifier
                 .wrapContentSize(
                     Alignment.TopCenter,
-
                     )
+                .animateContentSize(
+                    animationSpec = tween(300)
+                )
         ) {
             HorizontalPager(
                 beyondViewportPageCount = 1,
@@ -180,26 +186,43 @@ fun CalendarComponent(
 
                         val isCurrentMonth = date.month == currentMonth.month
 
-                        Text(
-                            text = date?.dayOfMonth?.toString() ?: "",
-                            textAlign = TextAlign.Center,
-                            color = if (LocalDate.now() == date) MaterialTheme.colorScheme.onPrimary else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface else Color.Gray,
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .padding(8.dp)
-                                .clip(CircleShape)
-                                .clickable {
-                                    date?.let {
-                                        onSelect(date)
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = date?.dayOfMonth?.toString() ?: "",
+                                textAlign = TextAlign.Center,
+                                color = if (LocalDate.now() == date) MaterialTheme.colorScheme.onPrimary else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface else Color.Gray,
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .padding(8.dp)
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        if (isCurrentMonth) {
+                                            onSelect(date)
+                                        }
                                     }
-                                }
-                                .background(
-                                    if (date == LocalDate.now()) Color.Magenta
-                                    else Color.Transparent
+                                    .background(
+                                        if (date == LocalDate.now()) Color.Magenta
+                                        else Color.Transparent
+                                    )
+                                    .border(border, CircleShape)
+                                    .wrapContentSize(Alignment.Center)
+                            )
+
+                            if (imageDates.contains(date)) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 2.dp)
+                                        .size(4.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
                                 )
-                                .border(border, CircleShape)
-                                .wrapContentSize(Alignment.Center)
-                        )
+                            }
+                        }
+
+
                     }
                 }
             }

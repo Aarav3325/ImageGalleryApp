@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -91,13 +92,17 @@ fun SearchScreen(
     }
 
 
-    LaunchedEffect(Unit) {
-        photosViewModel.getAllImages(context)
-    }
+//    LaunchedEffect(Unit) {
+//        photosViewModel.getAllImages(context)
+//        photosViewModel.loadAlbums(context)
+//    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
                 title = {
                     Text(
                         text = "Search",
@@ -148,7 +153,7 @@ fun SearchScreen(
                             Text(
                                 text = "No photos found for selected date",
                                 style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
                                 textAlign = TextAlign.Center
                             )
                         }

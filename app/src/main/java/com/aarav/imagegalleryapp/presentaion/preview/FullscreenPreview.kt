@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,19 +38,29 @@ fun FullscreenPreview(
 ) {
 
     val uiState by photosViewModel.uiState.collectAsState()
+//
+//    val allImages = photosViewModel.images.collectAsLazyPagingItems()
+//    val albumImages = photosViewModel.albumImages.collectAsLazyPagingItems()
 
-    val allImages = photosViewModel.images.collectAsLazyPagingItems()
-    val albumImages = photosViewModel.albumImages.collectAsLazyPagingItems()
+    val imagesUnpaged = uiState.images
+    val albumImagesUnpaged = uiState.albums.filter {
+        it.bucketId == uiState.selectedAlbum?.bucketId
+    }.map {
+        it.images
+    }.flatten()
+
+    LaunchedEffect(Unit) {
+    }
 
     val images = remember(uiState.activeSource) {
         when (uiState.activeSource) {
-            ImageSource.ALL -> allImages
-            ImageSource.ALBUM -> albumImages
+            ImageSource.ALL -> imagesUnpaged
+            ImageSource.ALBUM -> albumImagesUnpaged
         }
     }
 
-    val startIndex = remember(images.itemSnapshotList.items) {
-        images.itemSnapshotList.items.indexOfFirst {
+    val startIndex = remember(images) {
+        images.indexOfFirst {
             it.id == uiState.selectedImage?.id
         }.coerceAtLeast(0)
     }
@@ -57,7 +68,7 @@ fun FullscreenPreview(
     val pagerState = rememberPagerState(
         initialPage = startIndex,
         pageCount = {
-            images.itemCount
+            images.size
         }
     )
 

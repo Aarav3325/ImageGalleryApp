@@ -49,6 +49,10 @@ fun PhotosScreen(
 
     val images = photosViewModel.images.collectAsLazyPagingItems()
 
+
+    val context = LocalContext.current
+
+
     val groupedList = remember(images.itemSnapshotList.items) {
         images.itemSnapshotList.items
             .groupBy { formatDate(it.dateAdded) }
@@ -63,7 +67,10 @@ fun PhotosScreen(
         }
     }
 
-    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        photosViewModel.getAllImages(context)
+        photosViewModel.loadAlbums(context)
+    }
 
     LaunchedEffect(isGranted) {
         photosViewModel.onPermissionResult(isGranted)
