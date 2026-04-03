@@ -46,12 +46,10 @@ class PhotosViewModel
     }
 
     val images = permissionGranted
-        .flatMapLatest {
-            granted ->
-            if(granted) {
+        .flatMapLatest { granted ->
+            if (granted) {
                 repository.getAllImages()
-            }
-            else {
+            } else {
                 flowOf(PagingData.empty())
             }
         }
@@ -78,6 +76,19 @@ class PhotosViewModel
             it.copy(
                 isGranted = granted
             )
+        }
+    }
+
+    fun getAllImages(context: Context) {
+
+        viewModelScope.launch {
+            val images = repository.getAllImages(context)
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    images = images
+                )
+            }
         }
     }
 

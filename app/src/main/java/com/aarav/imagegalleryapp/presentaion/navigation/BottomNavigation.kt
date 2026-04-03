@@ -22,7 +22,8 @@ fun BottomNavigationBar(
 ) {
     val navItems = listOf(
         NavItem.Photos,
-        NavItem.Albums
+        NavItem.Albums,
+        NavItem.Search
     )
 
     val currentBackstackEntry by navController.currentBackStackEntryAsState()

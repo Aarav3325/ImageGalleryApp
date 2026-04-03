@@ -6,4 +6,5 @@ sealed class NavRoute(val path: String) {
     object Albums : NavRoute("albums")
     object AlbumDetail : NavRoute("albumDetail")
     object FullscreenPreview : NavRoute("fullscreenPreview")
+    object Search : NavRoute("search")
 }

@@ -3,6 +3,7 @@ package com.aarav.imagegalleryapp.presentaion.photos
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -33,6 +34,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.aarav.imagegalleryapp.data.model.ImageItem
+import com.aarav.imagegalleryapp.presentaion.components.CalendarComponent
 import com.aarav.imagegalleryapp.utils.SnackbarManager
 import com.aarav.imagegalleryapp.utils.formatDate
 
@@ -86,6 +88,11 @@ fun PhotosScreen(
                 .padding(it)
         ) {
             when {
+
+//                true -> {
+//                    CalendarComponent()
+//                }
+
                 !isGranted -> {
                     Text(
                         text = "Permission required to show images",
@@ -107,51 +114,54 @@ fun PhotosScreen(
                 }
 
                 else -> {
-                    LazyColumn(
-                        //contentPadding = PaddingValues(horizontal = 16.dp),
-                        modifier = Modifier.fillMaxSize()
-                            .padding(bottom = 82.dp),
-                    ) {
-                        var globalIndex = 0
-                        groupedList.forEach { (date, rows) ->
+                    Column() {
+                        LazyColumn(
+                            //contentPadding = PaddingValues(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxSize()
+                                .padding(bottom = 82.dp),
+                        ) {
 
-                            item {
-                                Text(
-                                    text = date,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                                )
-                            }
+                            var globalIndex = 0
+                            groupedList.forEach { (date, rows) ->
 
-                            items(rows) { row ->
+                                item {
+                                    Text(
+                                        text = date,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    )
+                                }
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
+                                items(rows) { row ->
 
-                                    row.forEachIndexed { localIndex, image ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
 
-                                        val currentIndex = globalIndex
+                                        row.forEachIndexed { localIndex, image ->
 
-                                        PhotoGridCell(
-                                            imageItem = image,
-                                            index = localIndex,
-                                            context = context,
-                                            modifier = Modifier.weight(1f),
-                                            onClick = {
-                                                photosViewModel.openPreview(currentIndex, ImageSource.ALL)
-                                                photosViewModel.onSelectImage(image)
-                                                navigateToDisplay()
-                                            }
-                                        )
+                                            val currentIndex = globalIndex
 
-                                        globalIndex++
-                                    }
+                                            PhotoGridCell(
+                                                imageItem = image,
+                                                index = localIndex,
+                                                context = context,
+                                                modifier = Modifier.weight(1f),
+                                                onClick = {
+                                                    photosViewModel.openPreview(currentIndex, ImageSource.ALL)
+                                                    photosViewModel.onSelectImage(image)
+                                                    navigateToDisplay()
+                                                }
+                                            )
 
-                                    repeat(3 - row.size) {
-                                        Spacer(modifier = Modifier.weight(1f))
+                                            globalIndex++
+                                        }
+
+                                        repeat(3 - row.size) {
+                                            Spacer(modifier = Modifier.weight(1f))
+                                        }
                                     }
                                 }
                             }

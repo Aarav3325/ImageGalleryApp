@@ -53,6 +53,7 @@ fun FullscreenPreview(
             it.id == uiState.selectedImage?.id
         }.coerceAtLeast(0)
     }
+
     val pagerState = rememberPagerState(
         initialPage = startIndex,
         pageCount = {

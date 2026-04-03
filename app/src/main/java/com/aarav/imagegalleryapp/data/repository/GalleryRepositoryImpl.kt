@@ -32,6 +32,8 @@ class GalleryRepositoryImpl
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
             MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.DATE_TAKEN,
+            MediaStore.Images.Media.DATE_MODIFIED,
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
         )
@@ -54,6 +56,11 @@ class GalleryRepositoryImpl
                 cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
             val displayNameColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val dateModifiedColumn = cursor.getColumnIndexOrThrow(
+                MediaStore.Images.Media.DATE_MODIFIED
+            )
+            val dateTakenColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -63,12 +70,23 @@ class GalleryRepositoryImpl
                     id
                 )
 
+                val dateTaken = cursor.getLong(dateTakenColumn)
+                val dateAdded = cursor.getLong(dateAddedColumn)
+                val dateModified = cursor.getLong(dateModifiedColumn)
+
+                val finalDate = when {
+                    dateTaken > 0 -> dateTaken
+                    dateModified > 0 -> dateModified * 1000
+                    dateAdded > 0 -> dateAdded * 1000
+                    else -> System.currentTimeMillis()
+                }
+
                 imageList.add(
                     ImageItem(
                         id,
                         cursor.getString(displayNameColumn),
                         uri,
-                        cursor.getLong(dateAddedColumn),
+                        finalDate,
                         cursor.getString(bucketIdColumn),
                         cursor.getString(bucketNameColumn)
                     )

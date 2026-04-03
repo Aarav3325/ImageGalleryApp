@@ -101,7 +101,8 @@ class MainActivity : ComponentActivity() {
 
             val showBottomRoutes = listOf(
                 NavRoute.Photos.path,
-                NavRoute.Albums.path
+                NavRoute.Albums.path,
+                NavRoute.Search.path
             )
 
             val isBottomBarVisible = currentRoute in showBottomRoutes

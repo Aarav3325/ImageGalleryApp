@@ -15,6 +15,7 @@ import com.aarav.imagegalleryapp.presentaion.albums.AlbumScreen
 import com.aarav.imagegalleryapp.presentaion.preview.FullscreenPreview
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosScreen
 import com.aarav.imagegalleryapp.presentaion.photos.PhotosViewModel
+import com.aarav.imagegalleryapp.presentaion.search.SearchScreen
 
 @Composable
 fun NavGraph(
@@ -46,6 +47,10 @@ fun NavGraph(
                 this
             )
             AddDisplayImageScreen(
+                navHostController,
+                this
+            )
+            AddSearchScreen(
                 navHostController,
                 this
             )
@@ -147,6 +152,29 @@ fun AddDisplayImageScreen(
             photosViewModel = sharedVM,
             onBack = {
                 navController.popBackStack()
+            }
+        )
+    }
+}
+
+fun AddSearchScreen(
+    navController: NavController,
+    navGraphBuilder: NavGraphBuilder
+) {
+    navGraphBuilder.composable(
+        route = NavRoute.Search.path
+    ) { backStackEntry ->
+
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("album_graph")
+        }
+
+        val sharedVM: PhotosViewModel = hiltViewModel(parentEntry)
+
+        SearchScreen(
+            photosViewModel = sharedVM,
+            navigateToDisplay = {
+                navController.navigate(NavRoute.FullscreenPreview.path)
             }
         )
     }
