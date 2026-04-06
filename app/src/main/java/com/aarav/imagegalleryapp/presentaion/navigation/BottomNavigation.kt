@@ -36,7 +36,7 @@ fun BottomNavigationBar(
     ) {
 
         navItems.forEachIndexed { index, item ->
-            val isSelected = currentRoute?.startsWith(item.path) == true
+            val isSelected = currentRoute == item.path
 
             NavigationBarItem(
                 selected = isSelected,
@@ -45,7 +45,7 @@ fun BottomNavigationBar(
                         navController.navigate(item.path) {
                             launchSingleTop = true
                             restoreState = true
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo("album_graph") {
                                 saveState = true
                             }
                         }

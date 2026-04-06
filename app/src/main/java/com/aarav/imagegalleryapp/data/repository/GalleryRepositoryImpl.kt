@@ -13,7 +13,9 @@ import com.aarav.imagegalleryapp.data.paging.AlbumPagingSource
 import com.aarav.imagegalleryapp.data.paging.GalleryPagingSource
 import com.aarav.imagegalleryapp.domain.GalleryRepository
 import com.aarav.imagegalleryapp.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GalleryRepositoryImpl
@@ -25,80 +27,84 @@ class GalleryRepositoryImpl
     private var cachedImages: List<ImageItem>? = null
 
 
-    override suspend fun getAllImages(context: Context): List<ImageItem> {
-        val imageList = mutableListOf<ImageItem>()
+    override suspend fun getAllImages(context: Context): List<ImageItem> =
+        withContext(Dispatchers.IO) {
 
-        val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.DATE_ADDED,
-            MediaStore.Images.Media.DATE_TAKEN,
-            MediaStore.Images.Media.DATE_MODIFIED,
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.Media.BUCKET_DISPLAY_NAME
-        )
+            val imageList = mutableListOf<ImageItem>()
 
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-
-        val query = context.contentResolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            null,
-            null,
-            sortOrder
-        )
-
-        query?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
-            val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
-            val bucketNameColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-            val displayNameColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val dateModifiedColumn = cursor.getColumnIndexOrThrow(
-                MediaStore.Images.Media.DATE_MODIFIED
+            val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.DATE_ADDED,
+                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.DATE_MODIFIED,
+                MediaStore.Images.Media.BUCKET_ID,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
             )
-            val dateTakenColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
 
+            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
-            while (cursor.moveToNext()) {
-                val id = cursor.getLong(idColumn)
+            val query = context.contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder
+            )
 
-                val uri = ContentUris.withAppendedId(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    id
+            query?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                val dateAddedColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+                val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
+                val bucketNameColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+                val displayNameColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+                val dateModifiedColumn = cursor.getColumnIndexOrThrow(
+                    MediaStore.Images.Media.DATE_MODIFIED
                 )
+                val dateTakenColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
 
-                val dateTaken = cursor.getLong(dateTakenColumn)
-                val dateAdded = cursor.getLong(dateAddedColumn)
-                val dateModified = cursor.getLong(dateModifiedColumn)
 
-                val finalDate = when {
-                    dateTaken > 0 -> dateTaken
-                    dateModified > 0 -> dateModified * 1000
-                    dateAdded > 0 -> dateAdded * 1000
-                    else -> System.currentTimeMillis()
-                }
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idColumn)
 
-                imageList.add(
-                    ImageItem(
-                        id,
-                        cursor.getString(displayNameColumn),
-                        uri,
-                        finalDate,
-                        cursor.getString(bucketIdColumn),
-                        cursor.getString(bucketNameColumn)
+                    val uri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        id
                     )
-                )
+
+                    val dateTaken = cursor.getLong(dateTakenColumn)
+                    val dateAdded = cursor.getLong(dateAddedColumn)
+                    val dateModified = cursor.getLong(dateModifiedColumn)
+
+                    val finalDate = when {
+                        dateTaken > 0 -> dateTaken
+                        dateModified > 0 -> dateModified * 1000
+                        dateAdded > 0 -> dateAdded * 1000
+                        else -> System.currentTimeMillis()
+                    }
+
+                    imageList.add(
+                        ImageItem(
+                            id,
+                            cursor.getString(displayNameColumn),
+                            uri,
+                            finalDate,
+                            cursor.getString(bucketIdColumn),
+                            cursor.getString(bucketNameColumn)
+                        )
+                    )
+                }
             }
+
+            cachedImages = imageList
+
+
+            imageList
         }
-
-        cachedImages = imageList
-
-
-        return imageList
-    }
 
     override suspend fun getAllAlbums(context: Context): Resource<List<Album>> {
 

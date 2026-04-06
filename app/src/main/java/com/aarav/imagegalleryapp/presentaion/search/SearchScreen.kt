@@ -72,8 +72,6 @@ fun SearchScreen(
                         .atZone(ZoneId.systemDefault())
                         .toLocalDate()
 
-                    Log.d("SEARCH", "img: $imageDate")
-                    Log.d("SEARCH", "sel: $selectedDate")
                     imageDate == selectedDate
                 }
 
@@ -127,11 +125,11 @@ fun SearchScreen(
             )
 
 
-            Log.d("SEARCH", "Search Screen: $final")
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier.fillMaxSize()
+                    .padding(bottom = 80.dp)
             ) {
 
                 item(
@@ -160,7 +158,6 @@ fun SearchScreen(
                     }
                 }
 
-                Log.d("SEARCH", "Search Screen: ${filteredImages.size}")
                 items(filteredImages.size) { index ->
                     val image = filteredImages[index]
 

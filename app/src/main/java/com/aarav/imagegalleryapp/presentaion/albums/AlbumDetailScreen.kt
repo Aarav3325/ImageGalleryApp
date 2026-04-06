@@ -67,7 +67,6 @@ fun AlbumDetailScreen(
 
     LaunchedEffect(Unit) {
         albumImages.refresh()
-        Log.d("MYTAG", "selected : ${albumImages.itemCount}")
     }
 
     val scope = rememberCoroutineScope()

@@ -29,7 +29,6 @@ class AlbumPagingSource
             )
         }
         catch (e: Exception) {
-            Log.d("MYTAG", e.message.toString())
             LoadResult.Error(e)
         }
     }

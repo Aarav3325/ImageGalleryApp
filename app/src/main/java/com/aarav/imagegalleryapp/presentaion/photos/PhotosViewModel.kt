@@ -135,7 +135,6 @@ class PhotosViewModel
             )
         }
 
-        Log.d("MYTAG", "current : ${uiState.value.selectedAlbum}")
     }
 
     fun openPreview(index: Int, source: ImageSource) {

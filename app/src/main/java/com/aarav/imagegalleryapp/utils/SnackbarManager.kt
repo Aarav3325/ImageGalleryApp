@@ -9,7 +9,6 @@ object SnackbarManager {
 
     fun bind(state: SnackbarHostState) {
         snackbarHostState = state
-        Log.i("SNACKBAR", "bind success")
     }
 
     suspend fun showMessage(message: String) {
